@@ -1,1 +1,1 @@
-docker run -it --rm -p 8080:8080 -v $PWD/src:/go/src/dbProjectGo db-project-go-development
+docker run -it --rm -p 8080:8080 -v $PWD/src:/go/src/dbProjectGo --network=db-project-mysql_appnet db-project-go-development:v1

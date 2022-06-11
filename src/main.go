@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"log"
+
+	"github.com/alidevjimmy/db-project-go/cmd"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	for {
-		fmt.Println("hello world!")
-		time.Sleep(time.Second * 2)
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
