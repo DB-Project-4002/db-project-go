@@ -10,6 +10,7 @@ type (
 	App struct {
 		Name    string `yaml:"name" envconfig:"CLEANSERVICE_APP_NAME"`
 		Address string `yaml:"port" envconfig:"CLEANSERVICE_APP_ADDRESS"`
+		Secret  string `yaml:"secret"`
 	}
 
 	Mysql struct {

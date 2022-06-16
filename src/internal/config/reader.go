@@ -23,7 +23,7 @@ func ReadYAML(path string, cfg *Config) (err error) {
 			err = e
 		}
 	}()
-
+	//
 	decoder := yaml.NewDecoder(file)
 
 	if err := decoder.Decode(cfg); err != nil {
