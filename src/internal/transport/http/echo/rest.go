@@ -12,14 +12,14 @@ import (
 )
 
 type rest struct {
-	echo    *echo.Echo
-	handler *handler
+	echo           *echo.Echo
+	userController *userController
 }
 
-func New(logger logger.Logger, accSrv service.Account) http.Rest {
+func New(logger logger.Logger, accSrv service.User) http.Rest {
 	return &rest{
 		echo: echo.New(),
-		handler: &handler{
+		userController: &userController{
 			logger:  logger,
 			account: accSrv,
 		}}

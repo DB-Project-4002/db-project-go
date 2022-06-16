@@ -5,4 +5,7 @@ type (
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
+
+	Register struct {
+	}
 )

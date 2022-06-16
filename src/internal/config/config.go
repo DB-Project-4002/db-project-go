@@ -2,26 +2,21 @@ package config
 
 type (
 	Config struct {
-		App     App     `yaml:"app"`
-		Mysql   Mysql   `yaml:"mysql"`
-		Account Account `yaml:"account"`
+		App   App   `yaml:"app"`
+		Mysql Mysql `yaml:"mysql"`
 	}
 
 	App struct {
-		Name    string `yaml:"name" envconfig:"CLEANSERVICE_APP_NAME"`
-		Address string `yaml:"port" envconfig:"CLEANSERVICE_APP_ADDRESS"`
+		Name    string `yaml:"name"`
+		Address string `yaml:"port"`
 		Secret  string `yaml:"secret"`
 	}
 
 	Mysql struct {
-		Username string `yaml:"username" envconfig:"CLEANSERVICE_MYSQL_USERNAME"`
-		Password string `yaml:"password" envconfig:"CLEANSERVICE_MYSQL_PASSWORD"`
-		DBName   string `yaml:"db_name" envconfig:"CLEANSERVICE_MYSQL_DBNAME"`
-		Host     string `yaml:"host" envconfig:"CLEANSERVICE_MYSQL_HOST"`
-		Port     string `yaml:"port" envconfig:"CLEANSERVICE_MYSQL_PORT"`
-	}
-
-	Account struct {
-		MinUsernameLength int `yaml:"min_username_length"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+		DBName   string `yaml:"db_name"`
+		Host     string `yaml:"host"`
+		Port     string `yaml:"port"`
 	}
 )

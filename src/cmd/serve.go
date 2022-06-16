@@ -9,7 +9,7 @@ import (
 	"github.com/alidevjimmy/db-project-go/internal/config"
 	"github.com/alidevjimmy/db-project-go/internal/pkg/logger/zap"
 	"github.com/alidevjimmy/db-project-go/internal/repository/mysql"
-	"github.com/alidevjimmy/db-project-go/internal/service/account"
+	"github.com/alidevjimmy/db-project-go/internal/service/user"
 	"github.com/alidevjimmy/db-project-go/internal/transport/http/echo"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap/zapcore"
@@ -37,7 +37,7 @@ func serve(c *cli.Context) error {
 		return err
 	}
 
-	accSrv := account.New(cfg.Account, mysqlRepo, logger)
+	accSrv := user.New(mysqlRepo, logger)
 
 	restServer := echo.New(logger, accSrv)
 	go func() {
