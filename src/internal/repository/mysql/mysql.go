@@ -27,5 +27,5 @@ func New(cfg config.Mysql, logger logger.Logger) (repository.Mysql, error) {
 }
 
 func dsn(cfg config.Mysql) string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.DBName)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", cfg.Username, cfg.Password, cfg.Host, cfg.DBName)
 }

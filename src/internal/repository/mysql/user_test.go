@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -11,7 +10,7 @@ import (
 )
 
 var (
-	user = &model.User{
+	user = model.User{
 		Name:     "ali",
 		Tag:      "ali:007",
 		Password: "password",
@@ -20,24 +19,38 @@ var (
 )
 
 func TestCreateUser(t *testing.T) {
-	query := fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", usersTable)
-	testMock.ExpectBegin()
-	testMock.ExpectExec(query).WithArgs(user.Name, user.Password, user.Tag, user.Email).WillReturnResult(sqlmock.NewResult(1, 1))
-	testMock.ExpectCommit()
+	prep := testMock.ExpectPrepare(createUserQuery)
+	prep.ExpectExec().WithArgs(user.Name, user.Password, user.Tag, user.Email).WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err := testMysql.CreateUser(context.Background(), user)
+	err := testMysql.CreateUser(context.Background(), &user)
 	assert.NoError(t, err)
 
 	err = testMock.ExpectationsWereMet()
 	assert.NoError(t, err)
 }
 
-// func TestCreateDuplicateUserEmail(t *testing.T) {
+func TestGetUserByID(t *testing.T) {
+	prep := testMock.ExpectPrepare(getUserByIDQuery)
+	user.ID = 1
+	prep.ExpectQuery().WithArgs(user.ID).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "tag", "password", "email", "created_at", "updated_at"}).AddRow(user.ID, user.Name, user.Tag, user.Password, user.Email, user.CreatedAt, user.UpdatedAt))
 
-// }
+	rowUser, err := testMysql.GetUserByID(context.Background(), user.ID)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, rowUser)
 
-// func TestCreateUserError(t *testing.T) {
-// 	mysql, mock := NewMock()
+	err = testMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
 
-// 	query := "SELECT * FROM users WHERE email = ?"
-// }
+func TestGetUserByEmailAndPassword(t *testing.T) {
+	prep := testMock.ExpectPrepare(getUserByEmailAndPasswordQuery)
+	user.ID = 1
+	prep.ExpectQuery().WithArgs(user.Email, user.Password).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "tag", "password", "email", "created_at", "updated_at"}).AddRow(user.ID, user.Name, user.Tag, user.Password, user.Email, user.CreatedAt, user.UpdatedAt))
+
+	rowUser, err := testMysql.GetUserByEmailAndPassword(context.Background(), user.Email, user.Password)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, rowUser)
+
+	err = testMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
