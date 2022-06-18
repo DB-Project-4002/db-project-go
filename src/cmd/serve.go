@@ -36,6 +36,7 @@ func serve(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	userSrv := user.New(mysqlRepo, logger)
 
 	restServer := echo.New(logger, userSrv)

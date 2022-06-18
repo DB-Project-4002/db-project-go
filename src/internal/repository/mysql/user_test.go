@@ -44,12 +44,25 @@ func TestGetUserByID(t *testing.T) {
 
 func TestGetUserByEmailAndPassword(t *testing.T) {
 	prep := testMock.ExpectPrepare(getUserByEmailAndPasswordQuery)
-	user.ID = 1
-	prep.ExpectQuery().WithArgs(user.Email, user.Password).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "tag", "password", "email", "created_at", "updated_at"}).AddRow(user.ID, user.Name, user.Tag, user.Password, user.Email, user.CreatedAt, user.UpdatedAt))
+	prep.ExpectQuery().WithArgs(user.Email, user.Password).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "tag", "password", "email", "created_at", "updated_at"}).AddRow(1, user.Name, user.Tag, user.Password, user.Email, user.CreatedAt, user.UpdatedAt))
 
 	rowUser, err := testMysql.GetUserByEmailAndPassword(context.Background(), user.Email, user.Password)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, rowUser)
+
+	err = testMock.ExpectationsWereMet()
+	assert.NoError(t, err)
+}
+
+func TestGetUserFriendsByUserID(t *testing.T) {
+	prep := testMock.ExpectPrepare(getUserFriendsByUserIDQuery)
+	prep.ExpectQuery().WithArgs(user.ID).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "tag", "password", "email", "created_at", "updated_at"}).
+		AddRow(1, user.Name, user.Tag, user.Password, user.Email, user.CreatedAt, user.UpdatedAt).
+		AddRow(2, user.Name, user.Tag, user.Password, user.Email, user.CreatedAt, user.UpdatedAt))
+
+	rows, err := testMysql.GetUserFriendsByUserID(context.Background(), user.ID)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, rows)
 
 	err = testMock.ExpectationsWereMet()
 	assert.NoError(t, err)

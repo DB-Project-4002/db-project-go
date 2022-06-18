@@ -10,13 +10,16 @@ import (
 )
 
 const (
-	usersTable = "users"
+	usersTable          = "users"
+	usersRelationsTable = "users_relations"
 )
 
+// SELECT * FROM users JOIN users_relations ON u1id = $userID AND friend = 1
 var (
-	createUserQuery  = fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", usersTable)
-	getUserByIDQuery = fmt.Sprintf("SELECT * FROM %s WHERE id = ?", usersTable)
+	createUserQuery                = fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", usersTable)
+	getUserByIDQuery               = fmt.Sprintf("SELECT * FROM %s WHERE id = ?", usersTable)
 	getUserByEmailAndPasswordQuery = fmt.Sprintf("SELECT * FROM %s WHERE email = ? AND password = ?", usersTable)
+	getUserFriendsByUserIDQuery    = fmt.Sprintf("SELECT * FROM %s WHERE id IN (SELECT %s.u2id FROM %s WHERE u1id = ? AND friend = 1)", usersTable, usersRelationsTable, usersRelationsTable)
 )
 
 func (m *mysql) CreateUser(ctx context.Context, user *model.User) error {
@@ -48,10 +51,10 @@ func (m *mysql) CreateUser(ctx context.Context, user *model.User) error {
 }
 
 func (m *mysql) GetUserByID(ctx context.Context, id int) (*model.User, error) {
-	etx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
 
-	stmt, err := m.db.PrepareContext(etx, getUserByIDQuery)
+	stmt, err := m.db.PrepareContext(ctx, getUserByIDQuery)
 	if err != nil {
 		m.logger.Error(err.Error())
 		return nil, err
@@ -76,10 +79,10 @@ func (m *mysql) GetUserByID(ctx context.Context, id int) (*model.User, error) {
 }
 
 func (m *mysql) GetUserByEmailAndPassword(ctx context.Context, email, password string) (*model.User, error) {
-	etx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
 
-	stmt, err := m.db.PrepareContext(etx, getUserByEmailAndPasswordQuery)
+	stmt, err := m.db.PrepareContext(ctx, getUserByEmailAndPasswordQuery)
 	if err != nil {
 		m.logger.Error(err.Error())
 		return nil, err
@@ -104,7 +107,36 @@ func (m *mysql) GetUserByEmailAndPassword(ctx context.Context, email, password s
 }
 
 func (m *mysql) GetUserFriendsByUserID(ctx context.Context, userID int) ([]*model.User, error) {
-	return nil, nil
+	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancleFunc()
+
+	stmt, err := m.db.PrepareContext(ctx, getUserFriendsByUserIDQuery)
+	if err != nil {
+		m.logger.Error(err.Error())
+		return nil, err
+	}
+	defer stmt.Close()
+
+	var users []*model.User
+
+	rows, err := stmt.QueryContext(ctx, userID)
+	if err != nil {
+		m.logger.Error(err.Error())
+		return nil, errors.New(err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var u model.User
+		err = rows.Scan(&u.ID, &u.Name, &u.Password, &u.Tag, &u.Email, &u.CreatedAt, &u.UpdatedAt)
+		if err != nil {
+			m.logger.Error(err.Error())
+			return nil, err
+		}
+		users = append(users, &u)
+	}
+
+	return users, nil
 }
 
 func (m *mysql) AddUserToFriends(ctx context.Context, userID, friendID int) error {
