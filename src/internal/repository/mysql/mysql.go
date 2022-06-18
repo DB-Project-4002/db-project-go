@@ -23,10 +23,9 @@ func New(cfg config.Mysql, logger logger.Logger) (repository.Mysql, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-
 	return &mysql{db: db, logger: logger}, nil
 }
 
 func dsn(cfg config.Mysql) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s", cfg.Username, cfg.Password, cfg.Host, cfg.DBName)
 }

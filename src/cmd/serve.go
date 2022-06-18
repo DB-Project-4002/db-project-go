@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/alidevjimmy/db-project-go/internal/config"
+	"github.com/alidevjimmy/db-project-go/internal/entity/model"
 	"github.com/alidevjimmy/db-project-go/internal/pkg/logger/zap"
 	"github.com/alidevjimmy/db-project-go/internal/repository/mysql"
 	"github.com/alidevjimmy/db-project-go/internal/service/user"
@@ -37,9 +40,20 @@ func serve(c *cli.Context) error {
 		return err
 	}
 
-	accSrv := user.New(mysqlRepo, logger)
+	// create user for test
+	err = mysqlRepo.CreateUser(context.Background(), &model.User{
+		Name:     "ali",
+		Password: "pass",
+		Tag:      "test",
+		Email:    "ali@gmail.com",
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	///////
+	userSrv := user.New(mysqlRepo, logger)
 
-	restServer := echo.New(logger, accSrv)
+	restServer := echo.New(logger, userSrv)
 	go func() {
 		if err := restServer.Start(cfg.App.Address); err != nil {
 			logger.Error(fmt.Sprintf("error happen while serving: %v", err))

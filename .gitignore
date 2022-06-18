@@ -14,3 +14,4 @@
 # Dependency directories (remove the comment below to include it)
 src/vendor/
 src/config.yml
+src/logs/app.log

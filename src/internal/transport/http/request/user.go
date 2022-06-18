@@ -7,5 +7,9 @@ type (
 	}
 
 	Register struct {
+		Name     string `json:"name"`
+		Password string `json:"password"`
+		Tag      string `json:"tag"`
+		Email    string `json:"email"`
 	}
 )
