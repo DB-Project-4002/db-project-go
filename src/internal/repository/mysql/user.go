@@ -10,16 +10,16 @@ import (
 )
 
 const (
-	usersTable          = "users"
-	usersRelationsTable = "users_relations"
+	usersTable          = "accounts"
+	usersRelationsTable = "accounts_relations"
 )
 
-// SELECT * FROM users JOIN users_relations ON u1id = $userID AND friend = 1
+
 var (
 	createUserQuery                = fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", usersTable)
 	getUserByIDQuery               = fmt.Sprintf("SELECT * FROM %s WHERE id = ?", usersTable)
 	getUserByEmailAndPasswordQuery = fmt.Sprintf("SELECT * FROM %s WHERE email = ? AND password = ?", usersTable)
-	getUserFriendsByUserIDQuery    = fmt.Sprintf("SELECT * FROM %s WHERE id IN (SELECT %s.u2id FROM %s WHERE u1id = ? AND friend = 1)", usersTable, usersRelationsTable, usersRelationsTable)
+	getUserFriendsByUserIDQuery    = fmt.Sprintf("SELECT * FROM %s JOIN %s ON %s.account_id_2 = %s.id AND %s.friend = 1 WHERE %s.account_id_1 = ?", usersTable, usersRelationsTable, usersRelationsTable, usersRelationsTable, usersRelationsTable,usersRelationsTable)
 )
 
 func (m *mysql) CreateUser(ctx context.Context, user *model.User) error {
