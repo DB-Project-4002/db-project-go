@@ -7,9 +7,10 @@ type (
 		} `json:"data"`
 	}
 
+	RegisterData struct {
+		Token string `json:"token"`
+	}
 	Register struct {
-		Data struct {
-			Token string `json:"token"`
-		} `json:"data"`
+		Data RegisterData `json:"data"`
 	}
 )

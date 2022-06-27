@@ -7,19 +7,29 @@ import (
 	"github.com/alidevjimmy/db-project-go/internal/pkg/logger"
 	"github.com/alidevjimmy/db-project-go/internal/service"
 	"github.com/alidevjimmy/db-project-go/internal/transport/http"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-type rest struct {
-	echo           *echo.Echo
-	userController *userController
+var (
+	validate *validator.Validate
+)
+
+func init() {
+	validate = validator.New()
 }
 
-func New(logger logger.Logger, accSrv service.User) http.Rest {
+type rest struct {
+	echo              *echo.Echo
+	accountController *accountController
+}
+
+func New(logger logger.Logger, accSrv service.Account) http.Rest {
 	return &rest{
 		echo: echo.New(),
-		userController: &userController{
+		accountController: &accountController{
 			logger:  logger,
 			account: accSrv,
 		}}
@@ -34,7 +44,7 @@ func (r *rest) Start(address string) error {
 }
 
 func (r *rest) Shutdown() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) // use config for time
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	return r.echo.Shutdown(ctx)

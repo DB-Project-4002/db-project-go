@@ -3,8 +3,8 @@ package echo
 func (r *rest) routing() {
 	g := r.echo.Group("/api/v1")
 
-	g.POST("/user/login", r.userController.login)
-	g.POST("/user", r.userController.register)
+	g.POST("/user/login", r.accountController.login)
+	g.POST("/user", r.accountController.register)
 	g.GET("/user/:id", nil)
 
 	g.GET("/user/:user_id/friends", nil)
