@@ -8,9 +8,10 @@ import (
 )
 
 type Mysql interface {
-	CreateAccount(ctx context.Context, account *model.Account) rest_err.RestErr
+	CreateAccount(ctx context.Context, account *model.Account) (*int, rest_err.RestErr)
 	GetUserByID(ctx context.Context, id int) (*model.Account, rest_err.RestErr)
 	GetUserByEmailAndPassword(ctx context.Context, email, password string) (*model.Account, rest_err.RestErr)
+	GetUserByNameAndTagPassword(ctx context.Context, name, tag, password string) (*model.Account, rest_err.RestErr)
 
 	GetUserFriendsByUserID(ctx context.Context, userID int) ([]*model.Account, rest_err.RestErr)
 	AddUserToFriends(ctx context.Context, userID, friendID int) rest_err.RestErr

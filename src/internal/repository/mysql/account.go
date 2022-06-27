@@ -17,13 +17,14 @@ const (
 )
 
 var (
-	createUserQuery                = fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", usersTable)
-	getUserByIDQuery               = fmt.Sprintf("SELECT * FROM %s WHERE id = ?", usersTable)
-	getUserByEmailAndPasswordQuery = fmt.Sprintf("SELECT * FROM %s WHERE email = ? AND password = ?", usersTable)
-	getUserFriendsByUserIDQuery    = fmt.Sprintf("SELECT * FROM %s JOIN %s ON %s.account_id_2 = %s.id AND %s.friend = 1 WHERE %s.account_id_1 = ?", usersTable, usersRelationsTable, usersRelationsTable, usersRelationsTable, usersRelationsTable, usersRelationsTable)
+	createUserQuery                     = fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", usersTable)
+	getUserByIDQuery                    = fmt.Sprintf("SELECT * FROM %s WHERE id = ?", usersTable)
+	getUserByEmailAndPasswordQuery      = fmt.Sprintf("SELECT * FROM %s WHERE email = ? AND password = ?", usersTable)
+	getUserByNameAndTagAndPasswordQuery = fmt.Sprintf("SELECT * FROM %s WHERE name = ? AND tag = ? AND password = ?", usersTable)
+	getUserFriendsByUserIDQuery         = fmt.Sprintf("SELECT * FROM %s JOIN %s ON %s.account_id_2 = %s.id AND %s.friend = 1 WHERE %s.account_id_1 = ?", usersTable, usersRelationsTable, usersRelationsTable, usersRelationsTable, usersRelationsTable, usersRelationsTable)
 )
 
-func (m *mysql) CreateAccount(ctx context.Context, account *model.Account) rest_err.RestErr {
+func (m *mysql) CreateAccount(ctx context.Context, account *model.Account) (*int, rest_err.RestErr) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancelFunc()
 
@@ -31,23 +32,20 @@ func (m *mysql) CreateAccount(ctx context.Context, account *model.Account) rest_
 
 	if err != nil {
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
-		return errR
+		return nil, errR
 	}
 	defer stmt.Close()
 
 	res, err := stmt.ExecContext(ctx, account.Name, account.Password, account.Tag, account.Email)
 	if err != nil {
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
-		return errR
+		return nil, errR
 	}
 
-	_, err = res.RowsAffected()
-	if err != nil {
-		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
-		return errR
-	}
-
-	return nil
+	lastID, _ := res.LastInsertId()
+	var uID int
+	uID = int(lastID)
+	return &uID, nil
 }
 
 func (m *mysql) GetUserByID(ctx context.Context, id int) (*model.Account, rest_err.RestErr) {
@@ -93,7 +91,37 @@ func (m *mysql) GetUserByEmailAndPassword(ctx context.Context, email, password s
 
 	row := stmt.QueryRowContext(ctx, email, password)
 	if row.Err() != nil {
-		errMsg := errors.New("user not found")
+		errMsg := errors.New("account not found")
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, errMsg.Error())
+
+		return nil, errR
+	}
+
+	if err = row.Scan(&u.ID, &u.Name, &u.Password, &u.Tag, &u.Email, &u.CreatedAt, &u.UpdatedAt); err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+
+		return nil, errR
+	}
+
+	return u, nil
+}
+
+func (m *mysql) GetUserByNameAndTagPassword(ctx context.Context, name, tag, password string) (*model.Account, rest_err.RestErr) {
+	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancleFunc()
+
+	stmt, err := m.db.PrepareContext(ctx, getUserByNameAndTagAndPasswordQuery)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return nil, errR
+	}
+	defer stmt.Close()
+
+	u := new(model.Account)
+
+	row := stmt.QueryRowContext(ctx, name, tag, password)
+	if row.Err() != nil {
+		errMsg := errors.New("account not found")
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, errMsg.Error())
 
 		return nil, errR

@@ -13,6 +13,8 @@ import (
 	"github.com/alidevjimmy/db-project-go/internal/transport/http/echo"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap/zapcore"
+	"github.com/alidevjimmy/db-project-go/pkg/jwt"
+
 )
 
 var serveCMD = &cli.Command{
@@ -37,9 +39,10 @@ func serve(c *cli.Context) error {
 		return err
 	}
 
-	userSrv := account.New(mysqlRepo, logger)
+	jwtpkg := jwt.New(cfg.App.Secret)
+	accountSrv := account.New(mysqlRepo, logger, jwtpkg)
 
-	restServer := echo.New(logger, userSrv)
+	restServer := echo.New(logger, accountSrv)
 	go func() {
 		if err := restServer.Start(cfg.App.Address); err != nil {
 			logger.Error(fmt.Sprintf("error happen while serving: %v", err))

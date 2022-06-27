@@ -2,8 +2,8 @@ package request
 
 type (
 	Login struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username string `json:"username" form:"username" validate:"required"`
+		Password string `json:"password" form:"password" validate:"required"`
 	}
 
 	Register struct {

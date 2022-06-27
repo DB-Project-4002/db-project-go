@@ -1,10 +1,11 @@
 package response
 
 type (
+	LoginData struct {
+		Token string `json:"token"`
+	}
 	Login struct {
-		Data struct {
-			Token string `json:"token"`
-		} `json:"data"`
+		Data LoginData `json:"data"`
 	}
 
 	RegisterData struct {
