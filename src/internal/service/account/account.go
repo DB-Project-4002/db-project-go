@@ -49,7 +49,7 @@ func (u *account) Register(ctx context.Context, account *model.Account) (*string
 
 func (u *account) Login(ctx context.Context, name, tag, password string) (*string, rest_err.RestErr) {
 	password = hash.GenerateSha256(password)
-	account, err := u.mysql.GetUserByNameAndTagPassword(ctx, name, tag, password)
+	account, err := u.mysql.GetAccountByNameAndTagPassword(ctx, name, tag, password)
 	if err != nil {
 		return nil, err
 	}
