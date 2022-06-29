@@ -12,31 +12,20 @@ import (
 )
 
 const (
-	accountsTable          = "accounts"
-	accountsRelationsTable = "accounts_relations"
-)
-
-var (
-	createAccountQuery                     = fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", accountsTable)
-	getAccountByIDQuery                    = fmt.Sprintf("SELECT * FROM %s WHERE id = ?", accountsTable)
-	getAccountByEmailAndPasswordQuery      = fmt.Sprintf("SELECT * FROM %s WHERE email = ? AND password = ?", accountsTable)
-	getAccountByNameAndTagAndPasswordQuery = fmt.Sprintf("SELECT * FROM %s WHERE name = ? AND tag = ? AND password = ?", accountsTable)
-	getAccountFriendsByAccountIDQuery      = fmt.Sprintf("SELECT * FROM %s JOIN %s ON %s.account_id_2 = %s.id AND %s.friend = 1 WHERE %s.account_id_1 = ?", accountsTable, accountsRelationsTable, accountsRelationsTable, accountsRelationsTable, accountsRelationsTable, accountsRelationsTable)
+	accountsTable                = "accounts"
+	accountsRelationsTable       = "accounts_relations"
+	gameAccountsTable            = "game_accounts"
+	championsTable               = "champions"
+	championSkiknsOwnershipTable = "champion_skin_ownerships"
+	championSkinsTable           = "champion_skins"
 )
 
 func (m *mysql) CreateAccount(ctx context.Context, account *model.Account) (*int, rest_err.RestErr) {
+	query := fmt.Sprintf("INSERT INTO %s (name,password,tag,email) VALUES (?,?,?,?)", accountsTable)
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancelFunc()
 
-	stmt, err := m.db.PrepareContext(ctx, createAccountQuery)
-
-	if err != nil {
-		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
-		return nil, errR
-	}
-	defer stmt.Close()
-
-	res, err := stmt.ExecContext(ctx, account.Name, account.Password, account.Tag, account.Email)
+	res, err := m.db.ExecContext(ctx, query, account.Name, account.Password, account.Tag, account.Email)
 	if err != nil {
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
 		return nil, errR
@@ -49,11 +38,13 @@ func (m *mysql) CreateAccount(ctx context.Context, account *model.Account) (*int
 }
 
 func (m *mysql) GetAccountByID(ctx context.Context, id int) (*model.Account, rest_err.RestErr) {
+	querry := fmt.Sprintf("SELECT * FROM %s WHERE id = ?", accountsTable)
+
 	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
 
 	acc := new(model.Account)
-	sqlscan.Get(ctx, m.db, acc, getAccountByIDQuery, id)
+	sqlscan.Get(ctx, m.db, acc, querry, id)
 	if acc.ID == 0 {
 		errR := rest_err.NewRestErr(http.StatusNotFound, "Account not found")
 		return nil, errR
@@ -62,11 +53,13 @@ func (m *mysql) GetAccountByID(ctx context.Context, id int) (*model.Account, res
 }
 
 func (m *mysql) GetAccountByEmailAndPassword(ctx context.Context, email, password string) (*model.Account, rest_err.RestErr) {
+	query := fmt.Sprintf("SELECT * FROM %s WHERE email = ? AND password = ?", accountsTable)
+
 	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
 
 	acc := new(model.Account)
-	sqlscan.Get(ctx, m.db, acc, getAccountByEmailAndPasswordQuery, email, password)
+	sqlscan.Get(ctx, m.db, acc, query, email, password)
 	if acc.ID == 0 {
 		errR := rest_err.NewRestErr(http.StatusNotFound, "Account not found")
 		return nil, errR
@@ -76,11 +69,13 @@ func (m *mysql) GetAccountByEmailAndPassword(ctx context.Context, email, passwor
 }
 
 func (m *mysql) GetAccountByNameAndTagPassword(ctx context.Context, name, tag, password string) (*model.Account, rest_err.RestErr) {
+	query := fmt.Sprintf("SELECT * FROM %s WHERE name = ? AND tag = ? AND password = ?", accountsTable)
+
 	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
 
 	acc := new(model.Account)
-	sqlscan.Get(ctx, m.db, acc, getAccountByNameAndTagAndPasswordQuery, name, tag, password)
+	sqlscan.Get(ctx, m.db, acc, query, name, tag, password)
 	if acc.ID == 0 {
 		errR := rest_err.NewRestErr(http.StatusNotFound, "Account not found")
 		return nil, errR
@@ -90,53 +85,144 @@ func (m *mysql) GetAccountByNameAndTagPassword(ctx context.Context, name, tag, p
 }
 
 func (m *mysql) GetAccountFriendsByAccountID(ctx context.Context, accountID int) ([]*model.Account, rest_err.RestErr) {
+	query := fmt.Sprintf("SELECT * FROM %s JOIN %s ON %s.account_id_2 = %s.id AND %s.friend = 1 WHERE %s.account_id_1 = ?", accountsTable, accountsRelationsTable, accountsRelationsTable, accountsRelationsTable, accountsRelationsTable, accountsRelationsTable)
+
 	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
 
-
 	var accounts []*model.Account
 
-	err := sqlscan.Select(ctx, m.db, accounts ,getAccountFriendsByAccountIDQuery, accountID)
+	err := sqlscan.Select(ctx, m.db, accounts, query, accountID)
 	if err != nil {
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
 		return nil, errR
 	}
-	
+
 	return accounts, nil
 }
 
-func (m *mysql) AddAccountToFriends(ctx context.Context, AccountID, friendID int) rest_err.RestErr {
+func (m *mysql) AddAccountToFriends(ctx context.Context, accountID, friendID int) rest_err.RestErr {
+	query := fmt.Sprintf("INSERT INTO %s (account_id_1,account_id_2,friend) VALUES (?,?,1)", accountsRelationsTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	_, err := m.db.ExecContext(ctx, query, accountID, friendID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
 	return nil
 }
 
-func (m *mysql) BlockAccountFriend(ctx context.Context, AccountID, friendID int) rest_err.RestErr {
+func (m *mysql) BlockAccountFriend(ctx context.Context, accountID, friendID int) rest_err.RestErr {
+	query := fmt.Sprintf("UPDATE %s SET blocked = 0 WHERE account_id_1 = ? AND account_id_2 = ?", accountsRelationsTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	_, err := m.db.ExecContext(ctx, query, accountID, friendID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+
 	return nil
 }
 
-func (m *mysql) DeleteAccountFriend(ctx context.Context, AccountID, friendID int) rest_err.RestErr {
+func (m *mysql) DeleteAccountFriend(ctx context.Context, accountID, friendID int) rest_err.RestErr {
+	query := fmt.Sprintf("DELETE FROM %s WHERE account_id_1 = ? AND account_id_2 = ?", accountsRelationsTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	_, err := m.db.ExecContext(ctx, query, accountID, friendID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+
 	return nil
 }
 
-func (m *mysql) GetAccountGameAccountsByAccountID(ctx context.Context, AccountID int) ([]*model.GameAccount, rest_err.RestErr) {
-	return nil, nil
+func (m *mysql) GetAccountGameAccountsByAccountID(ctx context.Context, accountID int) ([]*model.GameAccount, rest_err.RestErr) {
+	query := fmt.Sprintf("SELECT * FROM %s WHERE account_id = ?", gameAccountsTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	var gameAccounts []*model.GameAccount
+	err := sqlscan.Select(ctx, m.db, gameAccounts, query, accountID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return nil, errR
+	}
+	return gameAccounts, nil
 }
 
-func (m *mysql) CreateAccountGameAccount(ctx context.Context, AccountID int, gameAccount *model.GameAccount) rest_err.RestErr {
+func (m *mysql) CreateAccountGameAccount(ctx context.Context, accountID int, gameAccount *model.GameAccount) rest_err.RestErr {
+	query := fmt.Sprintf("INSERT INTO %s (account_id, name, level, avatar, avatar_border_id, game_credit, blue_essence, orange_essence, mythic_essence) VALUES (?,?,?,?,?,?,?,?,?)", gameAccountsTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	_, err := m.db.ExecContext(ctx, query, accountID, gameAccount.Name, gameAccount.Level, gameAccount.Avatar, gameAccount.AvatarBorderID, gameAccount.GameCredit, gameAccount.BlueEssence, gameAccount.OrangeEssence, gameAccount.MythicEssence)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+
 	return nil
 }
 
-func (m *mysql) GetAccountGameAccountChampionsByAccountID(ctx context.Context, AccountID int) ([]*model.Champion, rest_err.RestErr) {
-	return nil, nil
+func (m *mysql) GetAccountGameAccountChampionsByAccountID(ctx context.Context, accountID int) ([]*model.Champion, rest_err.RestErr) {
+	query := fmt.Sprintf(`SELECT name FROM %s JOIN %s ON %s.name = %s.champion_name WHERE %s.account_id = ?`, championsTable, championSkiknsOwnershipTable, championSkiknsOwnershipTable, championsTable, championSkiknsOwnershipTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	var champions []*model.Champion
+	err := sqlscan.Select(ctx, m.db, champions, query, accountID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return nil, errR
+	}
+	return champions, nil
 }
 
-func (m *mysql) CreateAccountGameAccountChampionByChampionNameAndAccountID(ctx context.Context, AccountID int, championName string) rest_err.RestErr {
+func (m *mysql) CreateAccountGameAccountChampionByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) rest_err.RestErr {
+	query := fmt.Sprintf("INSERT INTO %s (account_id, champion_name, champion_skin_name) VALUES (?,?,?)", championSkiknsOwnershipTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	_, err := m.db.ExecContext(ctx, query, accountID, championName, championName)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+
 	return nil
 }
 
-func (m *mysql) GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, AccountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr) {
-	return nil, nil
+func (m *mysql) GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr) {
+	query := fmt.Sprintf(`SELECT name FROM %s JOIN %s ON %s.champion_name = %s.champion_name WHERE %s.account_id = ?`, championSkinsTable, championSkiknsOwnershipTable, championSkiknsOwnershipTable, championSkinsTable, championSkiknsOwnershipTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	var championSkins []*model.ChampionSkins
+	err := sqlscan.Select(ctx, m.db, championSkins, query, accountID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return nil, errR
+	}
+
+	return championSkins, nil
 }
 
-func (m *mysql) CreateAccountGameAccountChampionSkinByChampionNameAndSkinNameAndAccountID(ctx context.Context, AccountID int, championName, skinName string) rest_err.RestErr {
+func (m *mysql) CreateAccountGameAccountChampionSkinByChampionNameAndSkinNameAndAccountID(ctx context.Context, accountID int, championName, skinName string) rest_err.RestErr {
+	query := fmt.Sprintf("INSERT INTO %s (account_id, champion_name, champion_skin_name) VALUES (?,?,?)", championSkiknsOwnershipTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	_, err := m.db.ExecContext(ctx, query, accountID, championName, skinName)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+
 	return nil
 }
