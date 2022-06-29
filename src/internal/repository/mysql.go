@@ -13,17 +13,17 @@ type Mysql interface {
 	GetAccountByEmailAndPassword(ctx context.Context, email, password string) (*model.Account, rest_err.RestErr)
 	GetAccountByNameAndTagPassword(ctx context.Context, name, tag, password string) (*model.Account, rest_err.RestErr)
 
-	GetAccountFriendsByAccountID(ctx context.Context, AccountID int) ([]*model.Account, rest_err.RestErr)
-	AddAccountToFriends(ctx context.Context, AccountID, friendID int) rest_err.RestErr
-	BlockAccountFriend(ctx context.Context, AccountID, friendID int) rest_err.RestErr
-	DeleteAccountFriend(ctx context.Context, AccountID, friendID int) rest_err.RestErr
+	GetAccountFriendsByAccountID(ctx context.Context, accountID int) ([]*model.Account, rest_err.RestErr)
+	AddAccountToFriends(ctx context.Context, accountID, friendID int) rest_err.RestErr
+	BlockAccountFriend(ctx context.Context, accountID, friendID int) rest_err.RestErr
+	DeleteAccountFriend(ctx context.Context, accountID, friendID int) rest_err.RestErr
 
-	GetAccountGameAccountsByAccountID(ctx context.Context, AccountID int) ([]*model.GameAccount, rest_err.RestErr)
+	GetAccountGameAccountsByAccountID(ctx context.Context, accountID int) ([]*model.GameAccount, rest_err.RestErr)
 	CreateAccountGameAccount(ctx context.Context, AccountID int, gameAccount *model.GameAccount) rest_err.RestErr
 
-	GetAccountGameAccountChampionsByAccountID(ctx context.Context, AccountID int) ([]*model.Champion, rest_err.RestErr)
-	CreateAccountGameAccountChampionByChampionNameAndAccountID(ctx context.Context, AccountID int, championName string) rest_err.RestErr
+	GetAccountGameAccountChampionsByAccountID(ctx context.Context, accountID int) ([]*model.Champion, rest_err.RestErr)
+	CreateAccountGameAccountChampionByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) rest_err.RestErr
 
-	GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, AccountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr)
-	CreateAccountGameAccountChampionSkinByChampionNameAndSkinNameAndAccountID(ctx context.Context, AccountID int, championName, skinName string) rest_err.RestErr
+	GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr)
+	CreateAccountGameAccountChampionSkinByChampionNameAndSkinNameAndAccountID(ctx context.Context, accountID int, championName, skinName string) rest_err.RestErr
 }
