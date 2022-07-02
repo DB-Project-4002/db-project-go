@@ -3,7 +3,7 @@ package model
 import "time"
 
 type GameAccount struct {
-	AccountID      string    `json:"account_id" db:"account_id"`
+	AccountID      int    `json:"account_id" db:"account_id"`
 	Name           string    `json:"name" db:"name"`
 	Level          int       `json:"level" db:"level"`
 	Avatar         string    `json:"avatar" db:"avatar"`

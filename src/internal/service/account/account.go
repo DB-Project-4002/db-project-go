@@ -66,6 +66,15 @@ func (a *account) Login(ctx context.Context, name, tag, password string) (*strin
 	return &token, nil
 }
 
+func (a *account) GetAccount(ctx context.Context, accountID int) (*model.Account, rest_err.RestErr) {
+	acc, err := a.mysql.GetAccountByID(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	return acc, nil
+}
+
 func (a *account) AddAccountToFriends(ctx context.Context, accountID int, friendID int) rest_err.RestErr {
 	err := a.mysql.AddAccountToFriends(ctx, accountID, friendID)
 	if err != nil {

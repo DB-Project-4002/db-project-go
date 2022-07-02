@@ -10,6 +10,7 @@ import (
 type Account interface {
 	Login(ctx context.Context, name, tag, password string) (*string, rest_err.RestErr)
 	Register(ctx context.Context, account *model.Account) (*string, rest_err.RestErr)
+	GetAccount(ctx context.Context, accountID int) (*model.Account, rest_err.RestErr)
 
 	GetAccountFriendsByAccountID(ctx context.Context, accountID int) ([]*model.Account, rest_err.RestErr)
 	AddAccountToFriends(ctx context.Context, accountID, friendID int) rest_err.RestErr

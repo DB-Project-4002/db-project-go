@@ -12,4 +12,5 @@ type (
 		Tag      string `json:"tag" form:"tag" validate:"required"`
 		Email    string `json:"email" form:"email" validate:"required,email"`
 	}
+
 )
