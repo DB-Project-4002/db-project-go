@@ -1,28 +1,27 @@
 package echo
 
 func (r *rest) routing() {
-	g := r.echo.Group("/api/v1")
 
-	g.POST("/account/login", r.accountController.login)           
-	g.POST("/account", r.accountController.register)              
-	g.GET("/account/:account_id", r.accountController.getAccount) 
+	r.echo.POST("/account/login", r.accountController.login)           
+	r.echo.POST("/account", r.accountController.register)              
+	r.echo.GET("/account/:account_id", r.accountController.getAccount) 
 
-	g.GET("/account/:account_id/friends", r.accountController.getAccountFriends)                         
-	g.POST("/account/:account_id/friends/:target_account_id", r.accountController.addAccountToFriends)   
-	g.PATCH("/account/:account_id/friends/:target_account_id", r.accountController.blockAccountFriend)   
-	g.DELETE("/account/:account_id/friends/:target_account_id", r.accountController.deleteAccountFriend) 
+	r.echo.GET("/account/:account_id/friends", r.accountController.getAccountFriends)                         
+	r.echo.POST("/account/:account_id/friends/:target_account_id", r.accountController.addAccountToFriends)   
+	r.echo.PATCH("/account/:account_id/friends/:target_account_id", r.accountController.blockAccountFriend)   
+	r.echo.DELETE("/account/:account_id/friends/:target_account_id", r.accountController.deleteAccountFriend) 
 
-	g.GET("/account/:account_id/game", r.accountController.getAccountGameAccounts) 
-	// g.POST("/account/:account_id/game", r.accountController.createAccountGameAccount)
+	r.echo.GET("/account/:account_id/game", r.accountController.getAccountGameAccounts) 
+	// r.echo.POST("/account/:account_id/game", r.accountController.createAccountGameAccount)
 
-	g.GET("/account/:account_id/game/champions", r.accountController.getAccountGameAccountChampions)                          
-	g.POST("/account/:account_id/game/champions/:champion_name", r.accountController.createAccountGameAccountChampion)        
-	g.GET("/account/:account_id/game/champions/:champion_name/skins", r.accountController.getAccountGameAccountChampionSkins)
-	g.POST("/account/:account_id/game/champions/:champion_name/skins/:skin_name", r.accountController.createAccountGameAccountChampionSkin)
+	r.echo.GET("/account/:account_id/game/champions", r.accountController.getAccountGameAccountChampions)                          
+	r.echo.POST("/account/:account_id/game/champions/:champion_name", r.accountController.createAccountGameAccountChampion)        
+	r.echo.GET("/account/:account_id/game/champions/:champion_name/skins", r.accountController.getAccountGameAccountChampionSkins)
+	r.echo.POST("/account/:account_id/game/champions/:champion_name/skins/:skin_name", r.accountController.createAccountGameAccountChampionSkin)
 
-	g.GET("/champions", nil)
-	g.GET("/champions/:champion_name", nil)
-	g.GET("/champions/:champion_name/skins", nil)
-	g.GET("/champions/:champion_name/skins/:skin_name", nil)
+	r.echo.GET("/champions", nil)
+	r.echo.GET("/champions/:champion_name", nil)
+	r.echo.GET("/champions/:champion_name/skins", nil)
+	r.echo.GET("/champions/:champion_name/skins/:skin_name", nil)
 
 }
