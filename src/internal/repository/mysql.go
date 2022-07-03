@@ -15,6 +15,7 @@ type Mysql interface {
 
 	GetAccountFriendsByAccountID(ctx context.Context, accountID int) ([]*model.Account, rest_err.RestErr)
 	AddAccountToFriends(ctx context.Context, accountID, friendID int) rest_err.RestErr
+	AddAccountToFriendsByUsername(ctx context.Context, accountID int, friendUsername string) rest_err.RestErr
 	BlockAccountFriend(ctx context.Context, accountID, friendID int) rest_err.RestErr
 	DeleteAccountFriend(ctx context.Context, accountID, friendID int) rest_err.RestErr
 

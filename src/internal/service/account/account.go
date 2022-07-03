@@ -83,6 +83,14 @@ func (a *account) AddAccountToFriends(ctx context.Context, accountID int, friend
 
 	return nil
 }
+func (a *account) AddAccountToFriendsByUsername(ctx context.Context, accountID int, friendUsername string) rest_err.RestErr {
+	err := a.mysql.AddAccountToFriendsByUsername(ctx, accountID, friendUsername)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (a *account) BlockAccountFriend(ctx context.Context, accountID int, friendID int) rest_err.RestErr {
 	err := a.mysql.BlockAccountFriend(context.Background(), accountID, friendID)

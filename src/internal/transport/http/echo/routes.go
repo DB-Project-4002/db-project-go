@@ -7,7 +7,8 @@ func (r *rest) routing() {
 	r.echo.GET("/account/:account_id", r.accountController.getAccount)
 
 	r.echo.GET("/account/:account_id/friends", r.accountController.getAccountFriends)
-	r.echo.POST("/account/:account_id/friends/:target_account_id", r.accountController.addAccountToFriends)
+	// r.echo.POST("/account/:account_id/friends/:target_account_id", r.accountController.addAccountToFriends)
+	r.echo.POST("/account/:account_id/friends", r.accountController.addAccountToFriendsByUsername)
 	r.echo.PATCH("/account/:account_id/friends/:target_account_id", r.accountController.blockAccountFriend)
 	r.echo.DELETE("/account/:account_id/friends/:target_account_id", r.accountController.deleteAccountFriend)
 

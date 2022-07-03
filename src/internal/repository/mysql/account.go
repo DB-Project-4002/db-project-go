@@ -2,8 +2,10 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/alidevjimmy/db-project-go/internal/entity/model"
@@ -117,6 +119,33 @@ func (m *mysql) AddAccountToFriends(ctx context.Context, accountID, friendID int
 	defer cancelFunc()
 
 	res, err := m.db.ExecContext(ctx, query, accountID, friendID)
+	if err != nil {
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+	if r, _ := res.RowsAffected(); r == 0 {
+		errR := rest_err.NewRestErr(http.StatusNotFound, "account not found")
+		return errR
+	}
+	return nil
+}
+func (m *mysql) AddAccountToFriendsByUsername(ctx context.Context, accountID int, friendUsername string) rest_err.RestErr {
+	username := strings.Split(friendUsername, "#")
+	user := new(model.Account)
+	userQuery := fmt.Sprintf("SELECT * FROM %s WHERE name = ? AND tag = ?", accountsTable)
+	if err := sqlscan.Get(ctx, m.db, user, userQuery, username[0], username[1]); err != nil {
+		if err.Error() == sql.ErrNoRows.Error() {
+			errR := rest_err.NewRestErr(http.StatusNotFound, "account not found")
+			return errR
+		}
+		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
+		return errR
+	}
+	query := fmt.Sprintf("INSERT INTO %s (account_id_1,account_id_2,friend) VALUES (?,?,1)", accountsRelationsTable)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+
+	res, err := m.db.ExecContext(ctx, query, accountID, user.ID)
 	if err != nil {
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())
 		return errR

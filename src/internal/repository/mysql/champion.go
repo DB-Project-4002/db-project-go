@@ -39,7 +39,7 @@ func (m *mysql) GetChampionByName(ctx context.Context, name string) (*model.Cham
 	champ := new(model.Champion)
 	err := sqlscan.Get(ctx, m.db, champ, query, name)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err.Error() == sql.ErrNoRows.Error() {
 			errR := rest_err.NewRestErr(http.StatusNotFound, "champion not found")
 			return nil, errR
 		}
@@ -85,7 +85,7 @@ func (m *mysql) GetChampionSkin(ctx context.Context, skinName string) (*model.Ch
 	err := sqlscan.Get(ctx, m.db, skin, query, skinName)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err.Error() == sql.ErrNoRows.Error() {
 			errR := rest_err.NewRestErr(http.StatusNotFound, "skin not found")
 			return nil, errR
 		}

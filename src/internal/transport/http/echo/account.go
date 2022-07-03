@@ -167,6 +167,40 @@ func (h *accountController) addAccountToFriends(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, resp)
 }
+func (h *accountController) addAccountToFriendsByUsername(c echo.Context) error {
+	accIDParam := c.Param("account_id")
+	accID, _ := strconv.Atoi(accIDParam)
+
+	bdy := struct {
+		TargetUsername string `json:"target_username"`
+	}{}
+	if err := c.Bind(&bdy); err != nil {
+		errR := response.ErrorResp{
+			Error: response.Error{
+				Code:    http.StatusBadRequest,
+				Message: err.Error(),
+			},
+		}
+		return c.JSON(errR.Error.Code, errR)
+	}
+
+	err := h.account.AddAccountToFriendsByUsername(context.Background(), accID, bdy.TargetUsername)
+	if err != nil {
+		errR := response.ErrorResp{
+			Error: response.Error{
+				Code:    err.StatusCode(),
+				Message: err.Error(),
+			},
+		}
+		return c.JSON(errR.Error.Code, errR)
+	}
+	resp := response.AddAccountToFriends{
+		Data: response.AddAccountToFriendsData{
+			Message: "account added to your friend list",
+		},
+	}
+	return c.JSON(http.StatusOK, resp)
+}
 
 func (h *accountController) blockAccountFriend(c echo.Context) error {
 	accIDParam := c.Param("account_id")
