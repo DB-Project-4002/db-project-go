@@ -26,4 +26,8 @@ type Mysql interface {
 
 	GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr)
 	CreateAccountGameAccountChampionSkinByChampionNameAndSkinNameAndAccountID(ctx context.Context, accountID int, championName, skinName string) rest_err.RestErr
+	GetChampions(ctx context.Context) ([]*model.Champion, rest_err.RestErr)
+	GetChampionByName(ctx context.Context, name string) (*model.Champion, rest_err.RestErr)
+	GetChampionSkins(ctx context.Context, champName string) ([]*model.ChampionSkins, rest_err.RestErr)
+	GetChampionSkin(ctx context.Context, skinName string) (*model.ChampionSkins, rest_err.RestErr)
 }

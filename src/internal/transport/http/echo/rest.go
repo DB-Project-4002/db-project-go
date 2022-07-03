@@ -24,15 +24,22 @@ func init() {
 type rest struct {
 	echo              *echo.Echo
 	accountController *accountController
+	championController *championController
+
 }
 
-func New(logger logger.Logger, accSrv service.Account) http.Rest {
+func New(logger logger.Logger, accSrv service.Account, champSrv service.Champion) http.Rest {
 	return &rest{
 		echo: echo.New(),
-		accountController: &accountController{
+		accountController: &accountController {
 			logger:  logger,
 			account: accSrv,
-		}}
+		},
+		championController: &championController {
+			logger:  logger,
+			champion: champSrv,
+		},
+	}
 }
 
 func (r *rest) Start(address string) error {
@@ -49,3 +56,4 @@ func (r *rest) Shutdown() error {
 
 	return r.echo.Shutdown(ctx)
 }
+
