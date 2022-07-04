@@ -20,9 +20,9 @@ func (r *rest) routing() {
 	r.echo.GET("/account/:account_id/game/champions/:champion_name/skins", r.accountController.getAccountGameAccountChampionSkins)
 	r.echo.POST("/account/:account_id/game/champions/:champion_name/skins/:skin_name", r.accountController.createAccountGameAccountChampionSkin)
 
-	r.echo.GET("/champions", r.championController.getChampions)
-	r.echo.GET("/champions/:champion_name", r.championController.getChampion)
-	r.echo.GET("/champions/:champion_name/skins", r.championController.getChampionSkins)
-	r.echo.GET("/champions/:champion_name/skins/:skin_name", r.championController.getChampionSkin)
+	r.echo.GET("/game/champions", r.championController.getChampions)
+	r.echo.GET("/game/champions/:champion_name", r.championController.getChampion)
+	r.echo.GET("/game/champions/:champion_name/skins", r.championController.getChampionSkins)
+	r.echo.GET("/game/champions/:champion_name/skins/:skin_name", r.championController.getChampionSkin)
 
 }
