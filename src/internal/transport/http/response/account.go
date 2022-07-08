@@ -4,14 +4,16 @@ import "time"
 
 type (
 	LoginData struct {
-		Token string `json:"token"`
+		Token     string `json:"token"`
+		AccountID int    `json:"account_id"`
 	}
 	Login struct {
 		Data LoginData `json:"data"`
 	}
 
 	RegisterData struct {
-		Token string `json:"token"`
+		Token     string `json:"token"`
+		AccountID int    `json:"account_id"`
 	}
 	Register struct {
 		Data RegisterData `json:"data"`

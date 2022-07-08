@@ -28,11 +28,11 @@ func New(mysql repository.Mysql, logger logger.Logger, jwtpkg jwt.Jwt) service.A
 	}
 }
 
-func (a *account) Register(ctx context.Context, account *model.Account) (*string, rest_err.RestErr) {
+func (a *account) Register(ctx context.Context, account *model.Account) (*string, *int, rest_err.RestErr) {
 	account.Password = hash.GenerateSha256(account.Password)
 	uID, err := a.mysql.CreateAccount(ctx, account)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	claims := map[string]interface{}{
 		"exp": time.Now().Unix() + int64(time.Hour*24*30*2),
@@ -42,16 +42,16 @@ func (a *account) Register(ctx context.Context, account *model.Account) (*string
 	token, errR := a.jwtpkg.GenerateToken(claims)
 	if err != nil {
 		err := rest_err.NewRestErr(http.StatusInternalServerError, errR.Error())
-		return nil, err
+		return nil, nil, err
 	}
-	return &token, nil
+	return &token, uID, nil
 }
 
-func (a *account) Login(ctx context.Context, name, tag, password string) (*string, rest_err.RestErr) {
+func (a *account) Login(ctx context.Context, name, tag, password string) (*string, *int, rest_err.RestErr) {
 	password = hash.GenerateSha256(password)
 	account, err := a.mysql.GetAccountByNameAndTagPassword(ctx, name, tag, password)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	claims := map[string]interface{}{
 		"exp": time.Now().Unix() + int64(time.Hour*24*30*2),
@@ -61,9 +61,9 @@ func (a *account) Login(ctx context.Context, name, tag, password string) (*strin
 	token, errR := a.jwtpkg.GenerateToken(claims)
 	if err != nil {
 		err := rest_err.NewRestErr(http.StatusInternalServerError, errR.Error())
-		return nil, err
+		return nil, nil, err
 	}
-	return &token, nil
+	return &token, &account.ID, nil
 }
 
 func (a *account) GetAccount(ctx context.Context, accountID int) (*model.Account, rest_err.RestErr) {

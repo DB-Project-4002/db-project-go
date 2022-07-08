@@ -45,7 +45,7 @@ func (h *accountController) register(c echo.Context) error {
 		Email:    data.Email,
 		Tag:      data.Tag,
 	}
-	token, err := h.account.Register(context.Background(), &account)
+	token, accID, err := h.account.Register(context.Background(), &account)
 	if err != nil {
 		errResp := response.ErrorResp{
 			Error: response.Error{
@@ -58,6 +58,7 @@ func (h *accountController) register(c echo.Context) error {
 	resp := response.Register{
 		Data: response.RegisterData{
 			Token: *token,
+			AccountID: *accID,
 		},
 	}
 	return c.JSON(http.StatusCreated, resp)
@@ -98,7 +99,7 @@ func (h *accountController) login(c echo.Context) error {
 		}
 		return c.JSON(errResp.Error.Code, errResp)
 	}
-	token, err := h.account.Login(context.Background(), unameSplit[0], unameSplit[1], password)
+	token, accID, err := h.account.Login(context.Background(), unameSplit[0], unameSplit[1], password)
 	if err != nil {
 		errResp := response.ErrorResp{
 			Error: response.Error{
@@ -111,6 +112,7 @@ func (h *accountController) login(c echo.Context) error {
 	resp := response.Register{
 		Data: response.RegisterData{
 			Token: *token,
+			AccountID: *accID,
 		},
 	}
 	return c.JSON(http.StatusCreated, resp)
