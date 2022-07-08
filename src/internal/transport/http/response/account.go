@@ -33,10 +33,11 @@ type (
 	}
 
 	GetAccountFriednsData struct {
-		ID    int    `json:"id"`
-		Name  string `json:"name"`
-		Tag   string `json:"tag"`
-		Email string `json:"email"`
+		ID      int    `json:"id"`
+		Name    string `json:"name"`
+		Tag     string `json:"tag"`
+		Email   string `json:"email"`
+		Blocked bool   `json:"is_blocked"`
 	}
 
 	GetAccountFriends struct {
@@ -118,7 +119,7 @@ type (
 	}
 
 	GetAccountGameAccountChampionSkinsData struct {
-		Name         string `json:"name"`
+		Name string `json:"name"`
 	}
 
 	GetAccountGameAccountChampionSkins struct {

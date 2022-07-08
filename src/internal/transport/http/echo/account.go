@@ -324,6 +324,7 @@ func (h *accountController) getAccountFriends(c echo.Context) error {
 			Name:  acc.Name,
 			Tag:   acc.Tag,
 			Email: acc.Email,
+			Blocked: acc.Blocked,
 		}
 		respAccs = append(respAccs, a)
 	}
