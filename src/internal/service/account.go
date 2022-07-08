@@ -24,6 +24,6 @@ type Account interface {
 	GetAccountGameAccountChampionsByAccountID(ctx context.Context, accountID int) ([]*model.Champion, rest_err.RestErr)
 	CreateAccountGameAccountChampionByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) rest_err.RestErr
 
-	GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr)
+	GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkiknsOwnership, rest_err.RestErr)
 	CreateAccountGameAccountChampionSkinByChampionNameAndSkinNameAndAccountID(ctx context.Context, accountID int, championName, skinName string) rest_err.RestErr
 }

@@ -339,7 +339,7 @@ func (h *accountController) getAccountGameAccountChampionSkins(c echo.Context) e
 
 	champName := c.Param("champion_name")
 
-	champs, err := h.account.GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(context.Background(), accID, champName)
+	skins, err := h.account.GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(context.Background(), accID, champName)
 	if err != nil {
 		errR := response.ErrorResp{
 			Error: response.Error{
@@ -350,10 +350,9 @@ func (h *accountController) getAccountGameAccountChampionSkins(c echo.Context) e
 		return c.JSON(errR.Error.Code, errR)
 	}
 	respSkins := []response.GetAccountGameAccountChampionSkinsData{}
-	for _, skn := range champs {
+	for _, skn := range skins {
 		a := response.GetAccountGameAccountChampionSkinsData{
-			Name:         skn.Name,
-			ChampionName: skn.ChampionName,
+			Name: skn.ChampionSkinName,
 		}
 		respSkins = append(respSkins, a)
 	}

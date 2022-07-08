@@ -146,7 +146,7 @@ func (a *account) GetAccountFriendsByAccountID(ctx context.Context, accountID in
 	return accs, nil
 }
 
-func (a *account) GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr) {
+func (a *account) GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkiknsOwnership, rest_err.RestErr) {
 	skns, err := a.mysql.GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(context.Background(), accountID, championName)
 	if err != nil {
 		return nil, err

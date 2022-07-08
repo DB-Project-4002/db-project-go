@@ -258,12 +258,12 @@ func (m *mysql) CreateAccountGameAccountChampionByChampionNameAndAccountID(ctx c
 	return nil
 }
 
-func (m *mysql) GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkins, rest_err.RestErr) {
+func (m *mysql) GetAccountGameAccountChampionSkinsByChampionNameAndAccountID(ctx context.Context, accountID int, championName string) ([]*model.ChampionSkiknsOwnership, rest_err.RestErr) {
 	query := fmt.Sprintf(`SELECT champion_skin_name FROM %s WHERE account_id = ? AND champion_name = ?`, championSkiknsOwnershipTable)
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancelFunc()
 
-	var championSkins []*model.ChampionSkins
+	var championSkins []*model.ChampionSkiknsOwnership
 	err := sqlscan.Select(ctx, m.db, &championSkins, query, accountID, championName)
 	if err != nil {
 		errR := rest_err.NewRestErr(http.StatusInternalServerError, err.Error())

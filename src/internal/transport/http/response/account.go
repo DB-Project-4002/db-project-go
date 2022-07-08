@@ -119,7 +119,6 @@ type (
 
 	GetAccountGameAccountChampionSkinsData struct {
 		Name         string `json:"name"`
-		ChampionName string `json:"champion_name"`
 	}
 
 	GetAccountGameAccountChampionSkins struct {
