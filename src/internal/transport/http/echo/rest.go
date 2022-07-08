@@ -7,6 +7,7 @@ import (
 	"github.com/alidevjimmy/db-project-go/internal/pkg/logger"
 	"github.com/alidevjimmy/db-project-go/internal/service"
 	"github.com/alidevjimmy/db-project-go/internal/transport/http"
+	"github.com/alidevjimmy/db-project-go/internal/transport/http/middlewares"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -22,22 +23,25 @@ func init() {
 }
 
 type rest struct {
-	echo              *echo.Echo
-	accountController *accountController
+	echo               *echo.Echo
+	accountController  *accountController
+	accountMiddleware  *middlewares.AccountMiddleware
 	championController *championController
-
 }
 
-func New(logger logger.Logger, accSrv service.Account, champSrv service.Champion) http.Rest {
+func New(logger logger.Logger, accSrv service.Account, accMdwr middlewares.AccountMiddleware, champSrv service.Champion) http.Rest {
 	return &rest{
 		echo: echo.New(),
-		accountController: &accountController {
+		accountController: &accountController{
 			logger:  logger,
 			account: accSrv,
 		},
-		championController: &championController {
-			logger:  logger,
+		championController: &championController{
+			logger:   logger,
 			champion: champSrv,
+		},
+		accountMiddleware: &middlewares.AccountMiddleware{
+			JwtPkg: accMdwr.JwtPkg,
 		},
 	}
 }
@@ -56,4 +60,3 @@ func (r *rest) Shutdown() error {
 
 	return r.echo.Shutdown(ctx)
 }
-
