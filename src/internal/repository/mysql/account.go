@@ -131,6 +131,10 @@ func (m *mysql) AddAccountToFriends(ctx context.Context, accountID, friendID int
 }
 func (m *mysql) AddAccountToFriendsByUsername(ctx context.Context, accountID int, friendUsername string) rest_err.RestErr {
 	username := strings.Split(friendUsername, "#")
+	if len(username) != 2 {
+		errR := rest_err.NewRestErr(http.StatusBadRequest, "username is not valid")
+		return errR
+	}
 	user := new(model.Account)
 	userQuery := fmt.Sprintf("SELECT * FROM %s WHERE name = ? AND tag = ?", accountsTable)
 	if err := sqlscan.Get(ctx, m.db, user, userQuery, username[0], username[1]); err != nil {
