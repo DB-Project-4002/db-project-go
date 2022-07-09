@@ -96,7 +96,7 @@ func (m *mysql) GetAccountByNameAndTagPassword(ctx context.Context, name, tag, p
 }
 
 func (m *mysql) GetAccountFriendsByAccountID(ctx context.Context, accountID int) ([]*model.Account, rest_err.RestErr) {
-	query := fmt.Sprintf("SELECT %s.*, blocked FROM %s JOIN %s ON %s.account_id_2 = %s.id AND %s.friend = 1 WHERE %s.account_id_1 = ?", accountsTable, accountsTable, accountsRelationsTable, accountsRelationsTable, accountsTable, accountsRelationsTable, accountsRelationsTable)
+	query := fmt.Sprintf("SELECT %s.*, blocked FROM %s JOIN %s ON %s.account_id_2 = %s.id WHERE %s.account_id_1 = ?", accountsTable, accountsTable, accountsRelationsTable, accountsRelationsTable, accountsTable, accountsRelationsTable)
 
 	ctx, cancleFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancleFunc()
@@ -228,7 +228,7 @@ func (m *mysql) CreateAccountGameAccount(ctx context.Context, accountID int, gam
 }
 
 func (m *mysql) GetAccountGameAccountChampionsByAccountID(ctx context.Context, accountID int) ([]*model.Champion, rest_err.RestErr) {
-	query := fmt.Sprintf(`SELECT name FROM %s JOIN %s ON %s.name = %s.champion_name WHERE %s.account_id = ?`, championsTable, championSkiknsOwnershipTable, championsTable, championSkiknsOwnershipTable, championSkiknsOwnershipTable)
+	query := fmt.Sprintf(`SELECT DISTINCT name FROM %s JOIN %s ON %s.name = %s.champion_name WHERE %s.account_id = ?`, championsTable, championSkiknsOwnershipTable, championsTable, championSkiknsOwnershipTable, championSkiknsOwnershipTable)
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancelFunc()
 

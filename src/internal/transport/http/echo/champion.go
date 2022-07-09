@@ -59,11 +59,12 @@ func (h *championController) getChampionSkins(c echo.Context) error {
 	respSkins := []response.GetChampionSkinsData{}
 	for _, skin := range skins {
 		a := response.GetChampionSkinsData{
-			Name:            skin.Name,
-			ChampionName:    skin.ChampionName,
-			GameCreditPrice: skin.GameCreditPrice,
-			CreatedAt:       skin.CreatedAt,
-			UpdatedAt:       skin.UpdatedAt,
+			Name:               skin.Name,
+			ChampionName:       skin.ChampionName,
+			GameCreditPrice:    skin.GameCreditPrice,
+			OrangeEssencePrice: skin.OrangeEssencePrice,
+			CreatedAt:          skin.CreatedAt,
+			UpdatedAt:          skin.UpdatedAt,
 		}
 		respSkins = append(respSkins, a)
 	}
